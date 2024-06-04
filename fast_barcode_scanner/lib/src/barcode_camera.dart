@@ -1,11 +1,6 @@
-import 'dart:ui';
-
 import 'package:fast_barcode_scanner/fast_barcode_scanner.dart';
-import 'package:fast_barcode_scanner/src/camera_controller.dart';
-import 'package:fast_barcode_scanner_platform_interface/fast_barcode_scanner_platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 typedef ErrorCallback = Widget Function(BuildContext context, Object? error);
@@ -37,7 +32,8 @@ class BarcodeCamera extends StatefulWidget {
     this.onScan,
     this.children = const [],
     ErrorCallback? onError,
-  })  : onError = onError ?? _defaultOnError,
+  })
+      : onError = onError ?? _defaultOnError,
         super(key: key);
 
   final List<BarcodeType> types;
@@ -64,8 +60,9 @@ class BarcodeCameraState extends State<BarcodeCamera> {
     super.didChangeDependencies();
 
     cameraController
-        .initialize(widget.types, widget.resolution, widget.framerate,
-            widget.position, widget.mode, widget.onScan)
+        .initialize(
+        widget.types, widget.resolution, widget.framerate, widget.position,
+        widget.mode, widget.onScan)
         .whenComplete(() => setState(() => _opacity = 1.0))
         .onError((error, stackTrace) => setState(() => showingError = true));
 
@@ -97,17 +94,17 @@ class BarcodeCameraState extends State<BarcodeCamera> {
         duration: const Duration(milliseconds: 260),
         child: cameraController.events.value == ScannerEvent.error
             ? widget.onError(
-                context,
-                cameraState.error ?? "Unknown error occured",
-              )
+          context,
+          cameraState.error ?? "Unknown error occured",
+        )
             : Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (cameraState.isInitialized)
-                    _buildPreview(cameraState.previewConfig!),
-                  ...widget.children
-                ],
-              ),
+          fit: StackFit.expand,
+          children: [
+            if (cameraState.isInitialized) _buildPreview(
+                cameraState.previewConfig!),
+            ...widget.children,
+          ],
+        ),
       ),
     );
   }
