@@ -39,7 +39,10 @@ abstract class FastBarcodeScannerPlatform extends PlatformInterface {
       Resolution resolution,
       Framerate framerate,
       DetectionMode detectionMode,
-      CameraPosition position) {
+      CameraPosition position,
+      double? linearZoom,
+      int? exposureCompensationIndex,
+      ) {
     throw UnimplementedError('init() has not been implemented');
   }
 
@@ -81,6 +84,8 @@ abstract class FastBarcodeScannerPlatform extends PlatformInterface {
     Framerate? framerate,
     DetectionMode? detectionMode,
     CameraPosition? position,
+    double? linearZoom,
+    int? exposureCompensationIndex,
   }) {
     throw UnimplementedError('changeConfiguration() has not been implemented');
   }

@@ -20,13 +20,20 @@ class MethodChannelFastBarcodeScanner extends FastBarcodeScannerPlatform {
       Resolution resolution,
       Framerate framerate,
       DetectionMode detectionMode,
-      CameraPosition position) async {
+      CameraPosition position,
+      [
+        double? linearZoom,
+        int? exposureCompensationIndex,
+      ]
+      ) async {
     final response = await _channel.invokeMethod('init', {
       'types': types.map((e) => e.name).toList(growable: false),
       'mode': detectionMode.name,
       'res': resolution.name,
       'fps': framerate.name,
-      'pos': position.name
+      'pos': position.name,
+      'linearZoom': linearZoom,
+      'exposureCompensationIndex': exposureCompensationIndex,
     });
 
     _channel.setMethodCallHandler(handlePlatformMethodCall);
@@ -64,6 +71,8 @@ class MethodChannelFastBarcodeScanner extends FastBarcodeScannerPlatform {
     Framerate? framerate,
     DetectionMode? detectionMode,
     CameraPosition? position,
+    double? linearZoom,
+    int? exposureCompensationIndex,
   }) async {
     final response = await _channel.invokeMethod('config', {
       if (types != null) 'types': types.map((e) => e.name).toList(),
@@ -71,6 +80,8 @@ class MethodChannelFastBarcodeScanner extends FastBarcodeScannerPlatform {
       if (resolution != null) 'res': resolution.name,
       if (framerate != null) 'fps': framerate.name,
       if (position != null) 'pos': position.name,
+      if (linearZoom != null) 'linearZoom': linearZoom,
+      if (exposureCompensationIndex != null) 'exposureCompensationIndex': exposureCompensationIndex,
     });
     return PreviewConfiguration(response);
   }
