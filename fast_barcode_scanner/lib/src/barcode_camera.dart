@@ -32,8 +32,9 @@ class BarcodeCamera extends StatefulWidget {
     this.onScan,
     this.children = const [],
     ErrorCallback? onError,
-  })
-      : onError = onError ?? _defaultOnError,
+    this.linearZoom,
+    this.exposureCompensationIndex,
+  })  : onError = onError ?? _defaultOnError,
         super(key: key);
 
   final List<BarcodeType> types;
@@ -44,6 +45,8 @@ class BarcodeCamera extends StatefulWidget {
   final void Function(Barcode)? onScan;
   final List<Widget> children;
   final ErrorCallback onError;
+  final double? linearZoom;
+  final int? exposureCompensationIndex;
 
   @override
   BarcodeCameraState createState() => BarcodeCameraState();
@@ -61,8 +64,15 @@ class BarcodeCameraState extends State<BarcodeCamera> {
 
     cameraController
         .initialize(
-        widget.types, widget.resolution, widget.framerate, widget.position,
-        widget.mode, widget.onScan)
+          widget.types,
+          widget.resolution,
+          widget.framerate,
+          widget.position,
+          widget.mode,
+          widget.linearZoom,
+          widget.exposureCompensationIndex,
+          widget.onScan,
+        )
         .whenComplete(() => setState(() => _opacity = 1.0))
         .onError((error, stackTrace) => setState(() => showingError = true));
 
@@ -94,17 +104,16 @@ class BarcodeCameraState extends State<BarcodeCamera> {
         duration: const Duration(milliseconds: 260),
         child: cameraController.events.value == ScannerEvent.error
             ? widget.onError(
-          context,
-          cameraState.error ?? "Unknown error occured",
-        )
+                context,
+                cameraState.error ?? "Unknown error occured",
+              )
             : Stack(
-          fit: StackFit.expand,
-          children: [
-            if (cameraState.isInitialized) _buildPreview(
-                cameraState.previewConfig!),
-            ...widget.children,
-          ],
-        ),
+                fit: StackFit.expand,
+                children: [
+                  if (cameraState.isInitialized) _buildPreview(cameraState.previewConfig!),
+                  ...widget.children,
+                ],
+              ),
       ),
     );
   }
