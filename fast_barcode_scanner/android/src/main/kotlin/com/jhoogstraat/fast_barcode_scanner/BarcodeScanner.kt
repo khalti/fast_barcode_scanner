@@ -99,8 +99,12 @@ class BarcodeScanner(private val flutterTextureEntry: TextureRegistry.SurfaceTex
                 DetectionMode.valueOf(args["mode"] as String),
                 Resolution.valueOf(args["res"] as String),
                 Framerate.valueOf(args["fps"] as String),
-                CameraPosition.valueOf(args["pos"] as String)
+                CameraPosition.valueOf(args["pos"] as String),
+                linearZoom = (args["linearZoom"] as Double?)?.toFloat(),
+                exposureCompensationIndex = args["exposureCompensationIndex"] as Int?,
             )
+            Log.d(TAG, "Scanner configuration: $scannerConfiguration")
+
         } catch (e: ScannerError) {
             return e.throwFlutterError(result)
         } catch (e: Exception) {
@@ -202,14 +206,19 @@ class BarcodeScanner(private val flutterTextureEntry: TextureRegistry.SurfaceTex
             val resolution = if (args.containsKey("res")) Resolution.valueOf(args["res"] as String) else scannerConfiguration.resolution
             val framerate = if (args.containsKey("fps")) Framerate.valueOf(args["fps"] as String) else scannerConfiguration.framerate
             val position = if (args.containsKey("pos")) CameraPosition.valueOf(args["pos"] as String) else scannerConfiguration.position
+            val linearZoom = if(args.containsKey("linearZoom")) (args["linearZoom"] as Double?)?.toFloat() else scannerConfiguration.linearZoom
+            val exposureCompensationIndex = if(args.containsKey("exposureCompensationIndex")) args["exposureCompensationIndex"] as Int? else scannerConfiguration.exposureCompensationIndex
 
             scannerConfiguration = scannerConfiguration.copy(
                 formats = formats,
                 mode = detectionMode,
                 resolution = resolution,
                 framerate = framerate,
-                position = position
+                position = position,
+                linearZoom = linearZoom,
+                exposureCompensationIndex = exposureCompensationIndex
             )
+            Log.d(TAG, "Updated Configuration: $scannerConfiguration")
         } catch (e: ScannerError) {
             return e.throwFlutterError(result)
         } catch (e: Exception) {
@@ -269,6 +278,15 @@ class BarcodeScanner(private val flutterTextureEntry: TextureRegistry.SurfaceTex
 
         // Bind camera to Lifecycle
         camera = cameraProvider.bindToLifecycle(activity!! as LifecycleOwner, cameraSelector, preview, imageAnalysis)
+
+        val exposureIndex = scannerConfiguration.exposureCompensationIndex;
+        val linearZoom = scannerConfiguration.linearZoom;
+
+        camera.cameraControl.apply {
+            if (exposureIndex != null) setExposureCompensationIndex(exposureIndex)
+            if (linearZoom != null) setLinearZoom(linearZoom)
+        }
+
 
         // Setup Surface
         cameraSurfaceProvider = Preview.SurfaceProvider {
