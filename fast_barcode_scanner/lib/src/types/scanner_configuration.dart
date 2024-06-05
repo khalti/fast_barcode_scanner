@@ -2,14 +2,14 @@ import 'package:fast_barcode_scanner_platform_interface/fast_barcode_scanner_pla
 
 class ScannerConfiguration {
   const ScannerConfiguration(
-      this.types,
-      this.resolution,
-      this.framerate,
-      this.position,
-      this.detectionMode,
-      this.linearZoom,
-      this.exposureCompensationIndex,
-      );
+    this.types,
+    this.resolution,
+    this.framerate,
+    this.position,
+    this.detectionMode,
+    this.linearZoom,
+    this.exposureCompensationIndex,
+  ) : assert(linearZoom == null || (linearZoom >= 0 && linearZoom <= 1), 'linearZoom should be in the range [0, 1]');
 
   /// The types the scanner should look out for.
   ///
