@@ -4,15 +4,21 @@ import android.util.Size
 import com.google.mlkit.vision.barcode.common.Barcode
 
 data class ScannerConfiguration(
-    val formats: IntArray, val mode: DetectionMode, val resolution: Resolution, val framerate: Framerate, val position: CameraPosition,
+    val formats: IntArray,
+    val mode: DetectionMode,
+    val resolution: Resolution,
+    val framerate: Framerate,
+    val position: CameraPosition,
     val linearZoom: Float? = null,
     val exposureCompensationIndex: Int? = null,
-)
+    )
 
-enum class Framerate {
+enum class Framerate
+{
     fps30, fps60, fps120, fps240;
 
-    fun intValue(): Int = when (this) {
+    fun intValue(): Int = when (this)
+    {
         fps30 -> 30
         fps60 -> 60
         fps120 -> 120
@@ -22,17 +28,20 @@ enum class Framerate {
     fun duration(): Long = 1 / intValue().toLong()
 }
 
-enum class Resolution {
+enum class Resolution
+{
     sd480, hd720, hd1080, hd4k;
 
-    private fun width(): Int = when (this) {
+    private fun width(): Int = when (this)
+    {
         sd480 -> 640
         hd720 -> 1280
         hd1080 -> 1920
         hd4k -> 3840
     }
 
-    private fun height(): Int = when (this) {
+    private fun height(): Int = when (this)
+    {
         sd480 -> 480
         hd720 -> 720
         hd1080 -> 1080
@@ -43,11 +52,13 @@ enum class Resolution {
     fun portrait(): Size = Size(height(), width())
 }
 
-enum class DetectionMode {
+enum class DetectionMode
+{
     pauseDetection, pauseVideo, continuous;
 }
 
-enum class CameraPosition {
+enum class CameraPosition
+{
     front, back;
 }
 
@@ -65,6 +76,6 @@ val barcodeFormatMap = hashMapOf(
     "qr" to Barcode.FORMAT_QR_CODE,
     "upcA" to Barcode.FORMAT_UPC_A,
     "upcE" to Barcode.FORMAT_UPC_E
-)
+                                )
 
 val barcodeStringMap = barcodeFormatMap.entries.associateBy({ it.value }) { it.key }
