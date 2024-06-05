@@ -138,8 +138,8 @@ class _CameraController implements CameraController {
         framerate,
         detectionMode,
         position,
-        linearZoom,
-        exposureCompensationIndex,
+        linearZoom: linearZoom,
+        exposureCompensationIndex: exposureCompensationIndex,
       );
 
       _platform.setOnDetectHandler((code) {

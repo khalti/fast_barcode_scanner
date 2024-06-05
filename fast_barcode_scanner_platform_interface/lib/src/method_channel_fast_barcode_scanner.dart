@@ -9,31 +9,28 @@ import 'types/preview_configuration.dart';
 import 'fast_barcode_scanner_platform_interface.dart';
 
 class MethodChannelFastBarcodeScanner extends FastBarcodeScannerPlatform {
-  static const MethodChannel _channel =
-      MethodChannel('com.jhoogstraat/fast_barcode_scanner');
+  static const MethodChannel _channel = MethodChannel('com.jhoogstraat/fast_barcode_scanner');
 
   void Function(Barcode)? _onDetectHandler;
 
   @override
   Future<PreviewConfiguration> init(
-      List<BarcodeType> types,
-      Resolution resolution,
-      Framerate framerate,
-      DetectionMode detectionMode,
-      CameraPosition position,
-      [
-        double? linearZoom,
-        int? exposureCompensationIndex,
-      ]
-      ) async {
+    List<BarcodeType> types,
+    Resolution resolution,
+    Framerate framerate,
+    DetectionMode detectionMode,
+    CameraPosition position, {
+    double? linearZoom,
+    int? exposureCompensationIndex,
+  }) async {
     final response = await _channel.invokeMethod('init', {
       'types': types.map((e) => e.name).toList(growable: false),
       'mode': detectionMode.name,
       'res': resolution.name,
       'fps': framerate.name,
       'pos': position.name,
-      'linearZoom': linearZoom,
-      'exposureCompensationIndex': exposureCompensationIndex,
+      if (linearZoom != null) 'linearZoom': linearZoom,
+      if (exposureCompensationIndex != null) 'exposureCompensationIndex': exposureCompensationIndex,
     });
 
     _channel.setMethodCallHandler(handlePlatformMethodCall);
@@ -61,8 +58,7 @@ class MethodChannelFastBarcodeScanner extends FastBarcodeScannerPlatform {
   // }
 
   @override
-  Future<bool> toggleTorch() =>
-      _channel.invokeMethod('torch').then<bool>((isOn) => isOn);
+  Future<bool> toggleTorch() => _channel.invokeMethod('torch').then<bool>((isOn) => isOn);
 
   @override
   Future<PreviewConfiguration> changeConfiguration({
@@ -87,8 +83,7 @@ class MethodChannelFastBarcodeScanner extends FastBarcodeScannerPlatform {
   }
 
   @override
-  void setOnDetectHandler(void Function(Barcode) handler) =>
-      _onDetectHandler = handler;
+  void setOnDetectHandler(void Function(Barcode) handler) => _onDetectHandler = handler;
 
   @override
   Future<List<Barcode>> scanImage(ImageSource source) async {
@@ -97,8 +92,7 @@ class MethodChannelFastBarcodeScanner extends FastBarcodeScannerPlatform {
       source.data,
     );
 
-    return response?.map((e) => Barcode(e as List<dynamic>)).toList() ??
-        const [];
+    return response?.map((e) => Barcode(e as List<dynamic>)).toList() ?? const [];
   }
 
   Future<void> handlePlatformMethodCall(MethodCall call) async {
@@ -114,8 +108,7 @@ class MethodChannelFastBarcodeScanner extends FastBarcodeScannerPlatform {
 
         break;
       default:
-        assert(true,
-            "FastBarcodeScanner: Unknown method call received: ${call.method}");
+        assert(true, "FastBarcodeScanner: Unknown method call received: ${call.method}");
     }
   }
 }
