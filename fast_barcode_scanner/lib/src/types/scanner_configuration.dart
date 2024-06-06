@@ -7,7 +7,9 @@ class ScannerConfiguration {
     this.framerate,
     this.position,
     this.detectionMode,
-  );
+    this.linearZoom,
+    this.exposureCompensationIndex,
+  ) : assert(linearZoom == null || (linearZoom >= 0 && linearZoom <= 1), 'linearZoom should be in the range [0, 1]');
 
   /// The types the scanner should look out for.
   ///
@@ -32,12 +34,24 @@ class ScannerConfiguration {
   /// Determines how the camera reacts to detected barcodes.
   final DetectionMode detectionMode;
 
+  /// Represents the zoom ratio as a linear scale with value ranging from 0.0 to 1.0
+  final double? linearZoom;
+
+  /// Represents the exposure level of an image captured by a camera
+  ///
+  /// Positive value will be exposed to brighter than the default exposure and
+  ///
+  /// negative value results in darker than the default exposure
+  final int? exposureCompensationIndex;
+
   ScannerConfiguration copyWith({
     List<BarcodeType>? types,
     Resolution? resolution,
     Framerate? framerate,
     DetectionMode? detectionMode,
     CameraPosition? position,
+    double? linearZoom,
+    int? exposureCompensationIndex,
   }) {
     return ScannerConfiguration(
       types ?? this.types,
@@ -45,6 +59,8 @@ class ScannerConfiguration {
       framerate ?? this.framerate,
       position ?? this.position,
       detectionMode ?? this.detectionMode,
+      linearZoom ?? this.linearZoom,
+      exposureCompensationIndex ?? this.exposureCompensationIndex,
     );
   }
 }

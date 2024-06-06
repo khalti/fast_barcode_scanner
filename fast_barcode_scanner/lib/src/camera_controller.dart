@@ -35,8 +35,7 @@ abstract class CameraController {
   /// A [ValueNotifier] for camera events.
   ///
   ///
-  final ValueNotifier<ScannerEvent> events =
-      ValueNotifier(ScannerEvent.uninitialized);
+  final ValueNotifier<ScannerEvent> events = ValueNotifier(ScannerEvent.uninitialized);
 
   /// Informs the platform to initialize the camera.
   ///
@@ -49,6 +48,8 @@ abstract class CameraController {
     Framerate framerate,
     CameraPosition position,
     DetectionMode detectionMode,
+    double? linearZoom,
+    int? exposureCompensationIndex,
     void Function(Barcode)? onScan,
   );
 
@@ -91,6 +92,8 @@ abstract class CameraController {
     Framerate? framerate,
     DetectionMode? detectionMode,
     CameraPosition? position,
+    double? linearZoom,
+    int? exposureCompensationIndex,
   }) {
     throw UnimplementedError();
   }
@@ -104,8 +107,7 @@ abstract class CameraController {
 class _CameraController implements CameraController {
   _CameraController._internal() : super();
 
-  final FastBarcodeScannerPlatform _platform =
-      FastBarcodeScannerPlatform.instance;
+  final FastBarcodeScannerPlatform _platform = FastBarcodeScannerPlatform.instance;
 
   @override
   final state = CameraState();
@@ -123,13 +125,22 @@ class _CameraController implements CameraController {
     Framerate framerate,
     CameraPosition position,
     DetectionMode detectionMode,
+    double? linearZoom,
+    int? exposureCompensationIndex,
     void Function(Barcode)? onScan,
   ) async {
     events.value = ScannerEvent.init;
 
     try {
       state._previewConfig = await _platform.init(
-          types, resolution, framerate, detectionMode, position);
+        types,
+        resolution,
+        framerate,
+        detectionMode,
+        position,
+        linearZoom: linearZoom,
+        exposureCompensationIndex: exposureCompensationIndex,
+      );
 
       _platform.setOnDetectHandler((code) {
         events.value = ScannerEvent.codeFound;
@@ -137,7 +148,14 @@ class _CameraController implements CameraController {
       });
 
       state._scannerConfig = ScannerConfiguration(
-          types, resolution, framerate, position, detectionMode);
+        types,
+        resolution,
+        framerate,
+        position,
+        detectionMode,
+        linearZoom,
+        exposureCompensationIndex,
+      );
 
       state._error = null;
 
@@ -235,6 +253,8 @@ class _CameraController implements CameraController {
     Framerate? framerate,
     DetectionMode? detectionMode,
     CameraPosition? position,
+    double? linearZoom,
+    int? exposureCompensationIndex,
   }) async {
     if (state.isInitialized && !_configuring) {
       final _scannerConfig = state._scannerConfig!;
@@ -247,6 +267,8 @@ class _CameraController implements CameraController {
           framerate: framerate,
           detectionMode: detectionMode,
           position: position,
+          linearZoom: linearZoom,
+          exposureCompensationIndex: exposureCompensationIndex,
         );
 
         state._scannerConfig = _scannerConfig.copyWith(
@@ -255,6 +277,8 @@ class _CameraController implements CameraController {
           framerate: framerate,
           detectionMode: detectionMode,
           position: position,
+          linearZoom: linearZoom,
+          exposureCompensationIndex: exposureCompensationIndex,
         );
       } catch (error) {
         state._error = error;
